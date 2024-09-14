@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #ifndef UTILS_H
 #define UTILS_H
 
@@ -7,6 +8,6 @@ struct Account{
     float balance;
 };
 
-void loggedInState(struct Account currentAccount);
+void loggedIn(struct Account currentAccount, bool isLoggedIn);
 
 #endif

@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 #include "utils.h"
 
 struct Account accounts[100];
 struct Account currentAccount;
 
 int accountCount = 0;
+bool isLoggedIn = false;
 
 struct Account makeAccount(char accountName[20]) {
     struct Account current = {0};
@@ -85,7 +87,7 @@ _Bool checkLogin() {
 }
 
 void initState() {
-    printf("Create an account: Press 1 ----- Sign in: Press 2\n");
+    printf("Create an account: ENTER 1 ----- Sign in: ENTER 2\n");
 
     _Bool found = checkLogin();
     if (found) {
@@ -102,7 +104,8 @@ int main() {
     printf("Welcome to C Bank\n");
 
     initState();
-    loggedInState(currentAccount);
+    isLoggedIn = true;
+    loggedIn(currentAccount, isLoggedIn);
 
     return 0;
 }
