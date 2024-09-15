@@ -105,6 +105,8 @@ int main() {
 
     initState();
     isLoggedIn = true;
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF); // clear input buffer
     loggedIn(currentAccount, isLoggedIn);
 
     return 0;

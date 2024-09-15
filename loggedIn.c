@@ -83,7 +83,7 @@ void handleDepositWithdraw() {
 }
 
 bool checkInput() {
-    char input[10];  // Increased buffer size
+    char input[10];
     printf("Enter your choice: ");
     if (fgets(input, sizeof(input), stdin) == NULL) {
         printf("Input error\n");
@@ -102,7 +102,6 @@ bool checkInput() {
             moreOptions();
             break;
         default:
-            printf("Invalid input. Please try again.\n");
             return false;
     }
     return true;
@@ -115,9 +114,10 @@ void loggedIn(struct Account currentAccount, bool isLoggedIn) {
         printf("--------------------\n");
         printf("View Balance: ENTER 1 ----- Deposit/Withdraw: ENTER 2 ----- More: ENTER 3\n");
 
-        int c;
-        while ((c = getchar()) != '\n' && c != EOF);
         if (!checkInput()) {
+            // Clear input buffer after invalid input
+            int c;
+            while ((c = getchar()) != '\n' && c != EOF);
             continue;  // If input was invalid, continue the loop
         }
         // Add logout logic here
