@@ -14,14 +14,63 @@ void clearScreen() {
 #endif
 }
 
-void moreOptions() {
-    printf("More options\n");
+void viewDetails() {
+    printf("Heres your account detials:\n");
+    printf("Account ID: %d\n", account.id);
+    printf("Name: %s\n", account.name);
+    printf("Balance: %.2f\n", account.balance);
+
+    printf("Do you want to see your password? (y/n): ");
+    char showPassword[10];
+    if (fgets(showPassword, sizeof(showPassword), stdin) == NULL) {
+        printf("Input error\n");
+        return;
+    }
+    showPassword[strcspn(showPassword, "\n")] = 0;
+
+    if (showPassword[0] == 'y') {
+        if (account.password[0] == '\0') return;
+        printf("Your password is: %s\n", account.password);
+        return;
+    } else if (showPassword[0] == 'n') {
+        printf("Cancelling\n");
+        return;
+    } else {
+        printf("Invalid input\n");
+        return;
+    }
     return;
+}
+
+void logout() {
+    return;
+}
+
+void moreOptions() {
+    while (3) {
+        printf("View details or Logout? (v/l) or 'q' to return to main menu: ");
+        char choice[3];
+        if (fgets(choice, sizeof(choice), stdin) == NULL) {
+            printf("Input error B0\n");
+            continue;
+        }
+        choice[strcspn(choice, "\n")] = 0;
+
+        if (choice[0] == 'v') {
+            viewDetails();
+        } else if (choice[0] == 'l') {
+            logout();
+        } else if (choice[0] == 'q') {
+            return;
+        } else {
+            printf("Invalid input. Please try again.\n");
+        }
+    }
 }
 
 void deposit() {
     float depositAmount;
-    char confirm[10];  // Increased buffer size
+    char confirm[10];
 
     printf("How much to Deposit?\n");
     if (scanf("%f", &depositAmount) != 1) {
@@ -58,7 +107,44 @@ void deposit() {
 
 void withdraw() {
     float withdrawAmount;
+    char confirm[10];
     printf("How much to Withdraw\n");
+
+    if (scanf("%f", &withdrawAmount) != 1) {
+        printf("Input error\n");
+        while (getchar() != '\n');  // Clear input buffer
+        return;
+    }
+    while (getchar() != '\n');  // Clear input buffer after scanf
+
+    if (withdrawAmount < 0) {
+        printf("Invalid amount\n");
+        return;
+    }
+
+    if (account.balance - withdrawAmount < 0) {
+        printf("Insufficient funds\n");
+        return;
+    }
+
+    printf("You are withdrawing %.2f. Confirm? (y/n)\n", withdrawAmount);
+    if (fgets(confirm, sizeof(confirm), stdin) == NULL) {
+        printf("Input error\n");
+        return;
+    }
+    confirm[strcspn(confirm, "\n")] = 0;  // Remove newline
+
+    if (confirm[0] == 'y') {
+        account.balance -= withdrawAmount;
+        printf("Your balance is: %.2f\n", account.balance);
+        return;
+    } else if (confirm[0] == 'n') {
+        printf("Cancelling withdrawal\n");
+        return;
+    } else {
+        printf("Invalid input\n");
+        return;
+    }
 }
 void handleDepositWithdraw() {
     while (1) {
@@ -120,6 +206,6 @@ void loggedIn(struct Account currentAccount, bool isLoggedIn) {
             while ((c = getchar()) != '\n' && c != EOF);
             continue;  // If input was invalid, continue the loop
         }
-        // Add logout logic here
     }
+    return;
 }

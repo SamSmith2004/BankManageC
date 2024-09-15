@@ -5,6 +5,7 @@
 struct Account{
     int id;
     char name[20];
+    char password[20];
     float balance;
 };
 
