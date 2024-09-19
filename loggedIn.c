@@ -1,4 +1,6 @@
 #include "utils.h"
+#include "bankFunctions.h"
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,6 +15,8 @@ void clearScreen() {
     system("clear");
 #endif
 }
+
+bool stayLoggedIn = false;
 
 void viewDetails() {
     printf("Heres your account detials:\n");
@@ -43,11 +47,30 @@ void viewDetails() {
 }
 
 void logout() {
-    return;
+    while (1) {
+        printf("Are you sure you want to Logout? (y/n): ");
+        char choice[3];
+        if (fgets(choice, sizeof(choice), stdin) == NULL) {
+            printf("Input error B0\n");
+            continue;
+        }
+        choice[strcspn(choice, "\n")] = 0;
+
+        if (choice[0] == 'n') {
+            return;
+        } else if (choice[0] == 'y') {
+            printf("Logging out...\n");
+            stayLoggedIn = false;
+            clearScreen();
+            return;
+        } else {
+            printf("Invalid Input. Please try again. \n");
+        }
+    }
 }
 
 void moreOptions() {
-    while (3) {
+    while (1) {
         printf("View details or Logout? (v/l) or 'q' to return to main menu: ");
         char choice[3];
         if (fgets(choice, sizeof(choice), stdin) == NULL) {
@@ -60,6 +83,7 @@ void moreOptions() {
             viewDetails();
         } else if (choice[0] == 'l') {
             logout();
+            if (!stayLoggedIn) break;
         } else if (choice[0] == 'q') {
             return;
         } else {
@@ -161,6 +185,7 @@ void handleDepositWithdraw() {
         } else if (choice[0] == 'w') {
             withdraw();
         } else if (choice[0] == 'q') {
+            clearScreen();
             return; // Return to main menu
         } else {
             printf("Invalid input. Please try again.\n");
@@ -193,10 +218,11 @@ bool checkInput() {
     return true;
 }
 
-void loggedIn(struct Account currentAccount, bool isLoggedIn) {
-    account = currentAccount;
+void loggedIn(struct Account* currentAccount, struct Account* lastLoggedInAccount, bool isLoggedIn) {
+    stayLoggedIn = isLoggedIn;
+    account = *currentAccount;
     clearScreen();
-    while (isLoggedIn) {
+    while (stayLoggedIn) {
         printf("--------------------\n");
         printf("View Balance: ENTER 1 ----- Deposit/Withdraw: ENTER 2 ----- More: ENTER 3\n");
 
@@ -207,5 +233,10 @@ void loggedIn(struct Account currentAccount, bool isLoggedIn) {
             continue;  // If input was invalid, continue the loop
         }
     }
-    return;
+    *lastLoggedInAccount = account;
+    *currentAccount = account;
+
+    updateAccount(&account);
+
+    runBankSystem(lastLoggedInAccount);
 }
