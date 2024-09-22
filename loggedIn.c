@@ -19,6 +19,74 @@ void clearScreen() {
 
 bool stayLoggedIn = false;
 
+void transfer() {
+    if (account.balance == 0) {
+        printf("You have no balance to transfer\n");
+        return;
+    }
+
+    printf("Enter the account name to transfer to: ");
+    char choice[20];
+    if (fgets(choice, sizeof(choice), stdin) == NULL) {
+        printf("Input error\n");
+        return;
+    }
+    choice[strcspn(choice, "\n")] = 0;
+
+    struct Account transferAccount;
+    bool accountFound = false;
+    for (int i = 0; i < 100; i++) {
+        if (strcmp(accounts[i].name, choice) == 0) {
+            transferAccount = accounts[i];
+            accountFound = true;
+            break;
+        }
+    }
+
+    if (!accountFound) {
+        printf("Account not found\n");
+        return;
+    }
+
+
+    printf("Enter the amount to transfer: ");
+    long long int amount;
+    if (scanf("%lld", &amount) != 1) {
+        printf("Input error\n");
+        return;
+    }
+    while (getchar() != '\n' && getchar() != EOF); // clear input buffer
+
+    if (amount > account.balance) {
+        printf("Insufficient balance\n");
+        return;
+    }
+
+    printf("Are you sure you want to transfer %.2f to %s? (y/n)\n", amount / 100.0, choice);
+    char confirm[3];
+    if (fgets(confirm, sizeof(confirm), stdin) == NULL) {
+        printf("Input error\n");
+        return;
+    }
+    confirm[strcspn(confirm, "\n")] = 0;
+
+    if (confirm[0] == 'y') {
+        account.balance -= amount;
+        transferAccount.balance += amount;
+        printf("Transfer complete! Your balance is %.2f", account.balance / 100.0);
+        updateAccount(&account);
+        updateAccount(&transferAccount);
+    } else if (confirm[0] == 'n') {
+        printf("Cancelling\n");
+        return;
+    } else {
+        printf("Invalid input\n");
+        return;
+    }
+
+    return;
+}
+
 void viewDetails() {
     printf("Heres your account detials:\n");
     printf("Account ID: %d\n", account.id);
@@ -111,12 +179,12 @@ void deposit() {
     }
 
     if (account.balance > LLONG_MAX - depositAmount) { // Check for overflow
-            printf("Error: Deposit amount too large\n");
-            return;
-        }
-
+        printf("Error: Deposit amount too large\n");
+        return;
+    }
 
     printf("You are depositing %.2f Confirm? (y/n)\n", depositAmount / 100.0);
+
     if (fgets(confirm, sizeof(confirm), stdin) == NULL) {
         printf("Input error\n");
         return;
@@ -211,7 +279,7 @@ bool checkInput() {
 
     switch(input[0]) {
         case '1':
-            printf("Your balance is: %.2f\n", account.balance / 100.0);
+            transfer();
             break;
         case '2':
             handleDepositWithdraw();
@@ -225,13 +293,13 @@ bool checkInput() {
     return true;
 }
 
-void loggedIn(struct Account* currentAccount, struct Account* lastLoggedInAccount, bool isLoggedIn) {
+void loggedIn(struct Account* currentAccount, struct Account* lastLoggedInAccount, bool isLoggedIn, struct Account* accounts) {
     stayLoggedIn = isLoggedIn;
     account = *currentAccount;
     clearScreen();
     while (stayLoggedIn) {
         printf("--------------------\n");
-        printf("View Balance: ENTER 1 ----- Deposit/Withdraw: ENTER 2 ----- More: ENTER 3\n");
+        printf("Transfer: ENTER 1 ----- Deposit/Withdraw: ENTER 2 ----- More: ENTER 3\n");
 
         if (!checkInput()) {
             // Clear input buffer after invalid input

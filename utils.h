@@ -10,6 +10,6 @@ struct Account{
     long long int balance;
 };
 
-void loggedIn(struct Account* currentAccount, struct Account* lastLoggedInAccount, bool isLoggedIn);
+void loggedIn(struct Account* currentAccount, struct Account* lastLoggedInAccount, bool isLoggedIn, struct Account* accounts);
 
 #endif

@@ -142,5 +142,5 @@ void runBankSystem(struct Account* lastLoggedInAccount) {
 
     int c;
     while ((c = getchar()) != '\n' && c != EOF); // clear input buffer
-    loggedIn(&currentAccount, lastLoggedInAccount, isLoggedIn);
+    loggedIn(&currentAccount, lastLoggedInAccount, isLoggedIn, accounts);
 }
