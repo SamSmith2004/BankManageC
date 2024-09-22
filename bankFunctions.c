@@ -38,7 +38,7 @@ struct Account makeAccount(char accountName[20]) {
     current.id = accountCount;
     strncpy(current.name, accountName, sizeof(current.name) - 1); // Copy at most sizeof(current.name) - 1 characters
     current.name[sizeof(current.name) - 1] = '\0';  // Ensure null-termination
-    current.balance = 0.0;
+    current.balance = 0;
 
     accounts[accountCount] = current;
     accountCount++;

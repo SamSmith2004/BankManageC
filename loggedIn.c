@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 struct Account account;
 
@@ -22,7 +23,7 @@ void viewDetails() {
     printf("Heres your account detials:\n");
     printf("Account ID: %d\n", account.id);
     printf("Name: %s\n", account.name);
-    printf("Balance: %.2f\n", account.balance);
+    printf("Balance: %.2f\n", account.balance / 100.0);
 
     printf("Do you want to see your password? (y/n): ");
     char showPassword[10];
@@ -93,11 +94,11 @@ void moreOptions() {
 }
 
 void deposit() {
-    float depositAmount;
+    long long int depositAmount;
     char confirm[10];
 
-    printf("How much to Deposit?\n");
-    if (scanf("%f", &depositAmount) != 1) {
+    printf("How much to Deposit?(in cents)\n");
+    if (scanf("%lld", &depositAmount) != 1) {
         printf("Input error\n");
         while (getchar() != '\n');  // Clear input buffer
         return;
@@ -109,7 +110,13 @@ void deposit() {
         return;
     }
 
-    printf("You are depositing %.2f. Confirm? (y/n)\n", depositAmount);
+    if (account.balance > LLONG_MAX - depositAmount) { // Check for overflow
+            printf("Error: Deposit amount too large\n");
+            return;
+        }
+
+
+    printf("You are depositing %.2f Confirm? (y/n)\n", depositAmount / 100.0);
     if (fgets(confirm, sizeof(confirm), stdin) == NULL) {
         printf("Input error\n");
         return;
@@ -118,7 +125,7 @@ void deposit() {
 
     if (confirm[0] == 'y') {
         account.balance += depositAmount;
-        printf("Your balance is: %.2f\n", account.balance);
+        printf("Your balance is: %.2f\n", account.balance / 100.0);
         return;
     } else if (confirm[0] == 'n') {
         printf("Cancelling deposit\n");
@@ -130,11 +137,11 @@ void deposit() {
 }
 
 void withdraw() {
-    float withdrawAmount;
+    long long int withdrawAmount;
     char confirm[10];
-    printf("How much to Withdraw\n");
+    printf("How much to Withdraw (in cents)\n");
 
-    if (scanf("%f", &withdrawAmount) != 1) {
+    if (scanf("%lld", &withdrawAmount) != 1) {
         printf("Input error\n");
         while (getchar() != '\n');  // Clear input buffer
         return;
@@ -146,12 +153,12 @@ void withdraw() {
         return;
     }
 
-    if (account.balance - withdrawAmount < 0) {
+    if (account.balance < withdrawAmount) {
         printf("Insufficient funds\n");
         return;
     }
 
-    printf("You are withdrawing %.2f. Confirm? (y/n)\n", withdrawAmount);
+    printf("You are withdrawing %.2f Confirm? (y/n)\n", withdrawAmount / 100.0);
     if (fgets(confirm, sizeof(confirm), stdin) == NULL) {
         printf("Input error\n");
         return;
@@ -160,7 +167,7 @@ void withdraw() {
 
     if (confirm[0] == 'y') {
         account.balance -= withdrawAmount;
-        printf("Your balance is: %.2f\n", account.balance);
+        printf("Your balance is: %.2f\n", account.balance / 100.0);
         return;
     } else if (confirm[0] == 'n') {
         printf("Cancelling withdrawal\n");
@@ -204,7 +211,7 @@ bool checkInput() {
 
     switch(input[0]) {
         case '1':
-            printf("Your balance is: %.2f\n", account.balance);
+            printf("Your balance is: %.2f\n", account.balance / 100.0);
             break;
         case '2':
             handleDepositWithdraw();
