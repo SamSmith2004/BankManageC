@@ -11,5 +11,6 @@ void initState(struct Account* lastLoggedInAccount);
 void runBankSystem(struct Account* lastLoggedInAccount);
 void updateAccount(struct Account* account);
 struct Account makeAccount(char accountName[20], char password[20]);
+struct Card setCard();
 
 #endif

@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+
 
 struct Account accounts[100];
 struct Account currentAccount;
@@ -16,6 +18,36 @@ void toLowercase(char* str) {
             str[i] = str[i] + 32;
         }
     }
+}
+
+int digit_count(int number) {
+    if (number == 0) return 1;  // Special case for 0
+
+    int count = 0;
+    int absolute = abs(number);  // Handle negative numbers
+
+    while (absolute != 0) {
+        absolute /= 10; // Remove the last digit
+        count++;
+    }
+
+    return count;
+}
+
+int luhnCheck(long long int number) {
+    int sum = 0;
+    int isEven = 0;
+    while (number > 0) {
+        int digit = number % 10;
+        if (isEven) {
+            digit *= 2;
+            if (digit > 9) digit -= 9;
+        }
+        sum += digit;
+        isEven = !isEven;
+        number /= 10;
+    }
+    return (sum % 10 == 0);
 }
 
 void updateAccount(struct Account* account) {
@@ -48,6 +80,63 @@ struct Account makeAccount(char accountName[20], char password[20]) {
     accountCount++;
     currentAccount = current;
     return current;
+}
+
+struct Card setCard() {
+    struct Card card = {0};
+    card.cardNumber = -1;
+    long long int cardNumber;
+    int expiryDate = 0;
+    char expiryDateStr[5];
+    short cvv;
+
+    printf("Enter your card number\n");
+    if (scanf("%lli", &cardNumber) == 1) {
+        if (digit_count(cardNumber) > 18 || digit_count(cardNumber) < 8) {
+            printf("Invalid card number\n");
+            return card;
+        }
+        // if (!luhnCheck(cardNumber)) {
+        //     printf("Invalid card number\n");
+        //     return card;
+        // }
+    } else {
+        printf("Input error\n");
+        return card;
+    }
+
+    printf("Enter your expiry date as MMYY\n");
+    if (scanf("%4s", expiryDateStr) == 1) {
+        if (strlen(expiryDateStr) != 4) {
+            printf("Invalid expiry date\n");
+            return card;
+        }
+        int month = (expiryDateStr[0] - '0') * 10 + (expiryDateStr[1] - '0');
+        int year = (expiryDateStr[2] - '0') * 10 + (expiryDateStr[3] - '0');
+        if (month < 1 || month > 12 || year < 23) {
+            printf("Invalid expiry date\n");
+            return card;
+        }
+        expiryDate = month * 100 + year;
+    } else {
+        printf("Input error\n");
+        return card;
+    }
+
+    printf("Enter your CVV\n");
+    if (scanf("%hd", &cvv) == 1) {
+        if (digit_count(cvv) < 3 || digit_count(cvv) > 4) {
+            printf("Invalid CVV\n");
+            return card;
+        }
+    } else {
+        printf("Input error\n");
+        return card;
+    }
+    card.cardNumber = cardNumber;
+    card.date = expiryDate;
+    card.cvv = cvv;
+    return card;
 }
 
 _Bool checkLogin(struct Account* lastLoggedInAccount) {
@@ -95,13 +184,28 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                 }
             }
 
+            struct Card card = setCard();
+            if (card.cardNumber == -1) {
+                printf("Failed to create account due to card error. 01\n");
+                return 0;
+            }
+
             struct Account account = makeAccount(name, password);
+            account.card = card;
+            currentAccount = account;
+            accounts[account.id] = account;
 
             if (account.id == -1) {
                 printf("Failed to create account due to account limit.\n");
             } else {
                 printf("Account created successfully with ID: %d\n", account.id);
             }
+
+            if (account.card.cardNumber == 0 || account.card.cvv == 0 || account.card.date == 0) {
+                printf("Failed to create account due to card error.02\n");
+                return 0;
+            }
+
             return 1;
         } else if (input[0] == '2') {
             printf("Enter your name\n");

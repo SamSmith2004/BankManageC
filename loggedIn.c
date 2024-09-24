@@ -93,19 +93,24 @@ void viewDetails() {
     printf("Name: %s\n", account.name);
     printf("Balance: %.2f\n", account.balance / 100.0);
 
-    printf("Do you want to see your password? (y/n): ");
-    char showPassword[10];
-    if (fgets(showPassword, sizeof(showPassword), stdin) == NULL) {
+    printf("Do you want to see your card details? (y/n): ");
+    char showCard[10];
+    if (fgets(showCard, sizeof(showCard), stdin) == NULL) {
         printf("Input error\n");
         return;
     }
-    showPassword[strcspn(showPassword, "\n")] = 0;
+    showCard[strcspn(showCard, "\n")] = 0;
 
-    if (showPassword[0] == 'y') {
-        if (account.password[0] == '\0') return;
-        printf("Your password is: %s\n", account.password);
+    if (showCard[0] == 'y') {
+        if (account.card.cardNumber) {
+            printf("Card Number: %lld\n", account.card.cardNumber);
+            printf("Expiry Date: %d/%d\n", account.card.date / 100, account.card.date % 100);
+            printf("CVV: %d\n", account.card.cvv);
+        } else {
+            printf("Error: You do not have a card\n");
+        }
         return;
-    } else if (showPassword[0] == 'n') {
+    } else if (showCard[0] == 'n') {
         printf("Cancelling\n");
         return;
     } else {
