@@ -27,7 +27,7 @@ void updateAccount(struct Account* account) {
     }
 }
 
-struct Account makeAccount(char accountName[20]) {
+struct Account makeAccount(char accountName[20], char password[20]) {
     struct Account current = {0};
     if (accountCount > 98) {
         printf("Account limit reached\n");
@@ -36,8 +36,12 @@ struct Account makeAccount(char accountName[20]) {
     }
 
     current.id = accountCount;
-    strncpy(current.name, accountName, sizeof(current.name) - 1); // Copy at most sizeof(current.name) - 1 characters
+    strncpy(current.name, accountName, sizeof(current.name) - 1);
+    // Copy at most sizeof(current.name) - 1 characters
+    strncpy(current.password, password, sizeof(current.password) - 1);
+    // Ideally hash the password before storing it
     current.name[sizeof(current.name) - 1] = '\0';  // Ensure null-termination
+    current.password[sizeof(current.password) - 1] = '\0';
     current.balance = 0;
 
     accounts[accountCount] = current;
@@ -75,7 +79,24 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                 }
             }
 
-            struct Account account = makeAccount(name);
+            char password[20];
+            printf("Enter your password\n");
+            if (scanf("%19s", password) != 1) {
+                printf("Input error\n");
+                return 0;
+            }
+
+            if (strlen(password) == 19) {
+                char c = getchar();
+                if (c != ' ' && c != '\n' && c != EOF) { // EOF is the end of file
+                    printf("Name too long\n");
+                    while (getchar() != '\n' && getchar() != EOF); // Clear the input buffer
+                    return 0;
+                }
+            }
+
+            struct Account account = makeAccount(name, password);
+
             if (account.id == -1) {
                 printf("Failed to create account due to account limit.\n");
             } else {
@@ -100,12 +121,60 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
             }
 
             if (lastLoggedInAccount->id != 0 && strcmp(lastLoggedInAccount->name, name) == 0) {
-                currentAccount = *lastLoggedInAccount;
-                return 1;
+                // If the last logged in account is the same as the current account
+
+                char password[20];
+                printf("Enter your password\n");
+                if (scanf("%19s", password) != 1) {
+                    printf("Input error\n");
+                    return 0;
+                }
+
+                if (strlen(password) == 19) {
+                    char c = getchar();
+                    if (c != ' ' && c != '\n' && c != EOF) {
+                        printf("Password too long\n");
+                        while (getchar() != '\n' && getchar() != EOF);
+                        return 0;
+                    }
+                }
+
+                if (strcmp(currentAccount.password, password) == 0) {
+                    printf("Logged in successfully\n");
+                    currentAccount = *lastLoggedInAccount;
+                    return 1;
+                } else {
+                    printf("Incorrect password\n");
+                    return 0;
+                }
             }
 
             for (int i = 0; i < accountCount; i++) {
                 if (strcmp(accounts[i].name, name) == 0) { // Cannot compare strings with ==
+                    char password[20];
+                    printf("Enter your password\n");
+                    if (scanf("%19s", password) != 1) {
+                        printf("Input error\n");
+                        return 0;
+                    }
+
+                    if (strlen(password) == 19) {
+                        char c = getchar();
+                        if (c != ' ' && c != '\n' && c != EOF) {
+                            printf("Password too long\n");
+                            while (getchar() != '\n' && getchar() != EOF);
+                            return 0;
+                        }
+                    }
+
+                    if (strcmp(accounts[i].password, password) == 0) {
+                        printf("Logged in successfully\n");
+                        currentAccount = accounts[i];
+                        return 1;
+                    } else {
+                        printf("Incorrect password\n");
+                        return 0;
+                    }
                     currentAccount = accounts[i];
                     return 1;
                 }

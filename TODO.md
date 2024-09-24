@@ -1,5 +1,6 @@
 #### TODO
 - [ X ] Fix 3 decimal issue
-- [] Implment passwords
+- [ x ] Impelment passwords
 - [ X ] Add transfers
 - [] Add account management
+- [] Hashing passwords
