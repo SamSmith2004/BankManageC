@@ -71,7 +71,7 @@ void transfer() {
     }
 
     char password[20];
-    printf("Enter your password to confirm: ");
+    printf("Enter your password to continue: ");
 
     if (fgets(password, sizeof(password), stdin) == NULL) {
         clearScreen();
@@ -177,9 +177,24 @@ void logout() {
     }
 }
 
-void moreOptions() {
+void deleteAccount() {
+    char password[20];
+    printf("Enter your password to continue: ");
+
+    if (fgets(password, sizeof(password), stdin) == NULL) {
+        clearScreen();
+        printf("Input error\n");
+        return;
+    }
+    password[strcspn(password, "\n")] = 0;
+    if (strcmp(password, account.password) != 0) {
+        clearScreen();
+        printf("Incorrect password\n");
+        return;
+    }
+
     while (1) {
-        printf("View details or Logout? (v/l) or 'q' to return to main menu: ");
+        printf("Are you sure you want to delete your account, this is permanent? (y/n): ");
         char choice[3];
         if (fgets(choice, sizeof(choice), stdin) == NULL) {
             clearScreen();
@@ -188,9 +203,48 @@ void moreOptions() {
         }
         choice[strcspn(choice, "\n")] = 0;
 
-        if (choice[0] == 'v') {
+        if (choice[0] == 'n') {
+            clearScreen();
+            printf("Cancelling\n");
+            return;
+        } else if (choice[0] == 'y') {
+            printf("deleting...\n");
+
+            for (int i = 0; i < 100; i++) {
+                if (accounts[i].id == account.id) {
+                    memset(&accounts[i], 0, sizeof(struct Account));
+                    break;
+                }
+            }
+            memset(&account, 0, sizeof(struct Account));
+
+            stayLoggedIn = false;
+            clearScreen();
+            return;
+        } else {
+            clearScreen();
+            printf("Invalid Input. Please try again. \n");
+        }
+    }
+}
+
+void moreOptions() {
+    while (1) {
+        printf("View details, Remove Account, Logout?(1,2,3) or 'q' to return to main menu: ");
+        char choice[3];
+        if (fgets(choice, sizeof(choice), stdin) == NULL) {
+            clearScreen();
+            printf("Input error B0\n");
+            continue;
+        }
+        choice[strcspn(choice, "\n")] = 0;
+
+        if (choice[0] == '1') {
             viewDetails();
-        } else if (choice[0] == 'l') {
+        } else if (choice[0] == '2') {
+            deleteAccount();
+            if (!stayLoggedIn) break;
+        } else if (choice[0] == '3') {
             logout();
             if (!stayLoggedIn) break;
         } else if (choice[0] == 'q') {
