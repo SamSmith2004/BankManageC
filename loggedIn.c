@@ -31,7 +31,12 @@ void transfer() {
         printf("Input error\n");
         return;
     }
+
     choice[strcspn(choice, "\n")] = 0;
+    if (strcmp(choice, account.name) == 0) {
+        printf("You cannot transfer to yourself\n");
+        return;
+    }
 
     struct Account transferAccount;
     bool accountFound = false;
@@ -74,7 +79,7 @@ void transfer() {
         return;
     }
     password[strcspn(password, "\n")] = 0;
-    if (strcmp(password, account.password) == 1) {
+    if (strcmp(password, account.password) != 0) {
         printf("Incorrect password\n");
         return;
     }
@@ -261,17 +266,16 @@ void withdraw() {
         return;
     }
 
-    short cvv;
-    printf("Enter your CVV: ");
-    if (scanf("%hd", &cvv) != 1) {
-        printf("Input error [C1]\n");
-        while (getchar() != '\n');  // Clear input buffer
+    char password[20];
+    printf("Enter your password to confirm: ");
+
+    if (fgets(password, sizeof(password), stdin) == NULL) {
+        printf("Input error\n");
         return;
     }
-    while (getchar() != '\n'); // Clear input buffer after scanf
-
-    if (cvv != account.card.cvv) {
-        printf("Invalid CVV\n");
+    password[strcspn(password, "\n")] = 0;
+    if (strcmp(password, account.password) != 0) {
+        printf("Incorrect password\n");
         return;
     }
 
