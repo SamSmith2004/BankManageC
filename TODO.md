@@ -5,5 +5,5 @@
 - [ X ] Add "card details" to account setup
 - [ X ] cvv to deposit/withdraw and password to transfers
 - [] Add account management
-- [] Cleanup CLI (add clears)
+- [ X ] Cleanup CLI (add clears)
 - [] Hashing passwords (OPTIONAL)

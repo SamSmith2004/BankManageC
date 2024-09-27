@@ -9,18 +9,11 @@
 
 struct Account account;
 
-void clearScreen() {
-#ifdef _WIN32
-    system("cls");
-#else
-    system("clear");
-#endif
-}
-
 bool stayLoggedIn = false;
 
 void transfer() {
     if (account.balance == 0) {
+        clearScreen();
         printf("You have no balance to transfer\n");
         return;
     }
@@ -28,12 +21,14 @@ void transfer() {
     printf("Enter the account name to transfer to: ");
     char choice[20];
     if (fgets(choice, sizeof(choice), stdin) == NULL) {
+        clearScreen();
         printf("Input error\n");
         return;
     }
 
     choice[strcspn(choice, "\n")] = 0;
     if (strcmp(choice, account.name) == 0) {
+        clearScreen();
         printf("You cannot transfer to yourself\n");
         return;
     }
@@ -49,6 +44,7 @@ void transfer() {
     }
 
     if (!accountFound) {
+        clearScreen();
         printf("Account not found\n");
         return;
     }
@@ -57,16 +53,19 @@ void transfer() {
     printf("Enter the amount to transfer: ");
     long long int amount;
     if (scanf("%lld", &amount) != 1) {
+        clearScreen();
         printf("Input error\n");
         return;
     }
     while (getchar() != '\n' && getchar() != EOF); // clear input buffer
 
     if (amount > account.balance) {
+        clearScreen();
         printf("Insufficient balance\n");
         return;
     }
     if (amount < 0) {
+        clearScreen();
         printf("Invalid amount\n");
         return;
     }
@@ -75,11 +74,13 @@ void transfer() {
     printf("Enter your password to confirm: ");
 
     if (fgets(password, sizeof(password), stdin) == NULL) {
+        clearScreen();
         printf("Input error\n");
         return;
     }
     password[strcspn(password, "\n")] = 0;
     if (strcmp(password, account.password) != 0) {
+        clearScreen();
         printf("Incorrect password\n");
         return;
     }
@@ -87,6 +88,7 @@ void transfer() {
     printf("Are you sure you want to transfer %.2f to %s? (y/n)\n", amount / 100.0, choice);
     char confirm[3];
     if (fgets(confirm, sizeof(confirm), stdin) == NULL) {
+        clearScreen();
         printf("Input error\n");
         return;
     }
@@ -95,13 +97,16 @@ void transfer() {
     if (confirm[0] == 'y') {
         account.balance -= amount;
         transferAccount.balance += amount;
-        printf("Transfer complete! Your balance is %.2f", account.balance / 100.0);
+        clearScreen();
+        printf("Transfer complete! Your balance is %.2f\n", account.balance / 100.0);
         updateAccount(&account);
         updateAccount(&transferAccount);
     } else if (confirm[0] == 'n') {
+        clearScreen();
         printf("Cancelling\n");
         return;
     } else {
+        clearScreen();
         printf("Invalid input\n");
         return;
     }
@@ -118,6 +123,7 @@ void viewDetails() {
     printf("Do you want to see your card details? (y/n): ");
     char showCard[10];
     if (fgets(showCard, sizeof(showCard), stdin) == NULL) {
+        clearScreen();
         printf("Input error\n");
         return;
     }
@@ -129,13 +135,16 @@ void viewDetails() {
             printf("Expiry Date: %d/%d\n", account.card.date / 100, account.card.date % 100);
             printf("CVV: %d\n", account.card.cvv);
         } else {
-            printf("Error: You do not have a card\n");
+            clearScreen();
+            printf("Error: You do not have a card. Please contact support at XXXXXXX\n");
         }
         return;
     } else if (showCard[0] == 'n') {
+        clearScreen();
         printf("Cancelling\n");
         return;
     } else {
+        clearScreen();
         printf("Invalid input\n");
         return;
     }
@@ -147,12 +156,14 @@ void logout() {
         printf("Are you sure you want to Logout? (y/n): ");
         char choice[3];
         if (fgets(choice, sizeof(choice), stdin) == NULL) {
+            clearScreen();
             printf("Input error B0\n");
             continue;
         }
         choice[strcspn(choice, "\n")] = 0;
 
         if (choice[0] == 'n') {
+            clearScreen();
             return;
         } else if (choice[0] == 'y') {
             printf("Logging out...\n");
@@ -160,6 +171,7 @@ void logout() {
             clearScreen();
             return;
         } else {
+            clearScreen();
             printf("Invalid Input. Please try again. \n");
         }
     }
@@ -170,6 +182,7 @@ void moreOptions() {
         printf("View details or Logout? (v/l) or 'q' to return to main menu: ");
         char choice[3];
         if (fgets(choice, sizeof(choice), stdin) == NULL) {
+            clearScreen();
             printf("Input error B0\n");
             continue;
         }
@@ -181,8 +194,10 @@ void moreOptions() {
             logout();
             if (!stayLoggedIn) break;
         } else if (choice[0] == 'q') {
+            clearScreen();
             return;
         } else {
+            clearScreen();
             printf("Invalid input. Please try again.\n");
         }
     }
@@ -194,6 +209,7 @@ void deposit() {
 
     printf("How much to Deposit?(in cents)\n");
     if (scanf("%lld", &depositAmount) != 1) {
+        clearScreen();
         printf("Input error\n");
         while (getchar() != '\n');  // Clear input buffer
         return;
@@ -201,11 +217,13 @@ void deposit() {
     while (getchar() != '\n');  // Clear input buffer after scanf
 
     if (depositAmount < 0) {
+        clearScreen();
         printf("Invalid amount\n");
         return;
     }
 
     if (account.balance > LLONG_MAX - depositAmount) { // Check for overflow
+        clearScreen();
         printf("Error: Deposit amount too large\n");
         return;
     }
@@ -214,12 +232,14 @@ void deposit() {
     printf("Enter your CVV: ");
     if (scanf("%hd", &cvv) != 1) {
         printf("Input error [C1]\n");
+        clearScreen();
         while (getchar() != '\n');  // Clear input buffer
         return;
     }
     while (getchar() != '\n'); // Clear input buffer after scanf
 
     if (cvv != account.card.cvv) {
+        clearScreen();
         printf("Invalid CVV\n");
         return;
     }
@@ -227,6 +247,7 @@ void deposit() {
     printf("You are depositing %.2f Confirm? (y/n)\n", depositAmount / 100.0);
 
     if (fgets(confirm, sizeof(confirm), stdin) == NULL) {
+        clearScreen();
         printf("Input error\n");
         return;
     }
@@ -234,12 +255,15 @@ void deposit() {
 
     if (confirm[0] == 'y') {
         account.balance += depositAmount;
+        clearScreen();
         printf("Your balance is: %.2f\n", account.balance / 100.0);
         return;
     } else if (confirm[0] == 'n') {
+        clearScreen();
         printf("Cancelling deposit\n");
         return;
     } else {
+        clearScreen();
         printf("Invalid input\n");
         return;
     }
@@ -250,6 +274,7 @@ void withdraw() {
     printf("How much to Withdraw (in cents)\n");
 
     if (scanf("%lld", &withdrawAmount) != 1) {
+        clearScreen();
         printf("Input error\n");
         while (getchar() != '\n');  // Clear input buffer
         return;
@@ -257,11 +282,13 @@ void withdraw() {
     while (getchar() != '\n');  // Clear input buffer after scanf
 
     if (withdrawAmount < 0) {
+        clearScreen();
         printf("Invalid amount\n");
         return;
     }
 
     if (account.balance < withdrawAmount) {
+        clearScreen();
         printf("Insufficient funds\n");
         return;
     }
@@ -270,11 +297,13 @@ void withdraw() {
     printf("Enter your password to confirm: ");
 
     if (fgets(password, sizeof(password), stdin) == NULL) {
+        clearScreen();
         printf("Input error\n");
         return;
     }
     password[strcspn(password, "\n")] = 0;
     if (strcmp(password, account.password) != 0) {
+        clearScreen();
         printf("Incorrect password\n");
         return;
     }
@@ -282,6 +311,7 @@ void withdraw() {
     char confirm[10];
     printf("You are withdrawing %.2f Confirm? (y/n)\n", withdrawAmount / 100.0);
     if (fgets(confirm, sizeof(confirm), stdin) == NULL) {
+        clearScreen();
         printf("Input error [C2]\n");
         return;
     }
@@ -289,12 +319,15 @@ void withdraw() {
 
     if (confirm[0] == 'y') {
         account.balance -= withdrawAmount;
+        clearScreen();
         printf("Your balance is: %.2f\n", account.balance / 100.0);
         return;
     } else if (confirm[0] == 'n') {
+        clearScreen();
         printf("Cancelling withdrawal\n");
         return;
     } else {
+        clearScreen();
         printf("Invalid input\n");
         return;
     }
@@ -304,6 +337,7 @@ void handleDepositWithdraw() {
         printf("Deposit or Withdraw? (d/w) or 'q' to return to main menu: ");
         char choice[3];
         if (fgets(choice, sizeof(choice), stdin) == NULL) {
+            clearScreen();
             printf("Input error B0\n");
             continue;
         }
@@ -342,6 +376,7 @@ bool checkInput() {
             moreOptions();
             break;
         default:
+            printf("Invalid input. Press Enter to try again.\n");
             return false;
     }
     return true;

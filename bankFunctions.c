@@ -1,9 +1,9 @@
 #include "bankFunctions.h"
+#include "utils.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
 
 struct Account accounts[100];
 struct Account currentAccount;
@@ -62,6 +62,7 @@ void updateAccount(struct Account* account) {
 struct Account makeAccount(char accountName[20], char password[20]) {
     struct Account current = {0};
     if (accountCount > 98) {
+        clearScreen();
         printf("Account limit reached\n");
         current.id = -1; // -1 indicates an Error
         return current;
@@ -93,6 +94,7 @@ struct Card setCard() {
     printf("Enter your card number\n");
     if (scanf("%lli", &cardNumber) == 1) {
         if (digit_count(cardNumber) > 18 || digit_count(cardNumber) < 8) {
+            clearScreen();
             printf("Invalid card number\n");
             return card;
         }
@@ -101,6 +103,7 @@ struct Card setCard() {
         //     return card;
         // }
     } else {
+        clearScreen();
         printf("Input error\n");
         return card;
     }
@@ -108,17 +111,20 @@ struct Card setCard() {
     printf("Enter your expiry date as MMYY\n");
     if (scanf("%4s", expiryDateStr) == 1) {
         if (strlen(expiryDateStr) != 4) {
+            clearScreen();
             printf("Invalid expiry date\n");
             return card;
         }
         int month = (expiryDateStr[0] - '0') * 10 + (expiryDateStr[1] - '0');
         int year = (expiryDateStr[2] - '0') * 10 + (expiryDateStr[3] - '0');
         if (month < 1 || month > 12 || year < 23) {
+            clearScreen();
             printf("Invalid expiry date\n");
             return card;
         }
         expiryDate = month * 100 + year;
     } else {
+        clearScreen();
         printf("Input error\n");
         return card;
     }
@@ -126,10 +132,12 @@ struct Card setCard() {
     printf("Enter your CVV\n");
     if (scanf("%hd", &cvv) == 1) {
         if (digit_count(cvv) < 3 || digit_count(cvv) > 4) {
+            clearScreen();
             printf("Invalid CVV\n");
             return card;
         }
     } else {
+        clearScreen();
         printf("Input error\n");
         return card;
     }
@@ -146,6 +154,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
             printf("Enter your name\n");
             char name[20];
             if (scanf("%19s", name) != 1) {
+                clearScreen();
                 printf("Input error\n");
                 return 0;
             }
@@ -153,6 +162,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                 char c = getchar();
                 if (c != ' ' && c != '\n' && c != EOF) {
                     // EOF is the end of file
+                    clearScreen();
                     printf("Name too long\n");
                     // Clear the input buffer
                     while (getchar() != '\n' && getchar() != EOF);
@@ -163,6 +173,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
             for (int i = 0; i < 100 ;i++) {
                 toLowercase(name);
                 if (strcmp(accounts[i].name, name) == 0) {
+                    clearScreen();
                     printf("Account already exists\n");
                     return 0;
                 }
@@ -171,6 +182,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
             char password[20];
             printf("Enter your password\n");
             if (scanf("%19s", password) != 1) {
+                clearScreen();
                 printf("Input error\n");
                 return 0;
             }
@@ -178,6 +190,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
             if (strlen(password) == 19) {
                 char c = getchar();
                 if (c != ' ' && c != '\n' && c != EOF) { // EOF is the end of file
+                    clearScreen();
                     printf("Name too long\n");
                     while (getchar() != '\n' && getchar() != EOF); // Clear the input buffer
                     return 0;
@@ -186,6 +199,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
 
             struct Card card = setCard();
             if (card.cardNumber == -1) {
+                clearScreen();
                 printf("Failed to create account due to card error. 01\n");
                 return 0;
             }
@@ -196,12 +210,15 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
             accounts[account.id] = account;
 
             if (account.id == -1) {
+                clearScreen();
                 printf("Failed to create account due to account limit.\n");
             } else {
+                clearScreen();
                 printf("Account created successfully with ID: %d\n", account.id);
             }
 
             if (account.card.cardNumber == 0 || account.card.cvv == 0 || account.card.date == 0) {
+                clearScreen();
                 printf("Failed to create account due to card error.02\n");
                 return 0;
             }
@@ -211,12 +228,14 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
             printf("Enter your name\n");
             char name[20];
             if (scanf("%19s", name) != 1) {
+                clearScreen();
                 printf("Input error\n");
                 return 0;
             }
             if (strlen(name) == 19) {
                 char c = getchar();
                 if (c != ' ' && c != '\n' && c != EOF) {
+                    clearScreen();
                     printf("Name too long\n");
                     // Clear the input buffer
                     while (getchar() != '\n' && getchar() != EOF);
@@ -230,6 +249,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                 char password[20];
                 printf("Enter your password\n");
                 if (scanf("%19s", password) != 1) {
+                    clearScreen();
                     printf("Input error\n");
                     return 0;
                 }
@@ -237,6 +257,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                 if (strlen(password) == 19) {
                     char c = getchar();
                     if (c != ' ' && c != '\n' && c != EOF) {
+                        clearScreen();
                         printf("Password too long\n");
                         while (getchar() != '\n' && getchar() != EOF);
                         return 0;
@@ -244,10 +265,12 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                 }
 
                 if (strcmp(currentAccount.password, password) == 0) {
+                    clearScreen();
                     printf("Logged in successfully\n");
                     currentAccount = *lastLoggedInAccount;
                     return 1;
                 } else {
+                    clearScreen();
                     printf("Incorrect password\n");
                     return 0;
                 }
@@ -258,6 +281,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                     char password[20];
                     printf("Enter your password\n");
                     if (scanf("%19s", password) != 1) {
+                        clearScreen();
                         printf("Input error\n");
                         return 0;
                     }
@@ -265,6 +289,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                     if (strlen(password) == 19) {
                         char c = getchar();
                         if (c != ' ' && c != '\n' && c != EOF) {
+                            clearScreen();
                             printf("Password too long\n");
                             while (getchar() != '\n' && getchar() != EOF);
                             return 0;
@@ -272,6 +297,7 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                     }
 
                     if (strcmp(accounts[i].password, password) == 0) {
+                        clearScreen();
                         printf("Logged in successfully\n");
                         currentAccount = accounts[i];
                         return 1;
@@ -283,10 +309,12 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                     return 1;
                 }
             }
+            clearScreen();
             printf("Account not found\n");
             return 0;
         }
     } else {
+        clearScreen();
         printf("Invalid input\n");
         return 0;
     }
@@ -299,6 +327,7 @@ void initState(struct Account* lastLoggedInAccount) {
     _Bool found = checkLogin(lastLoggedInAccount);
     if (found) {
         char buffer[40];
+        clearScreen();
         snprintf(buffer, sizeof(buffer), "Welcome back %s\n", currentAccount.name);
         printf("%s", buffer);
     } else {

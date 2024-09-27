@@ -17,6 +17,7 @@ struct Account{
     struct Card card;
 };
 
+void clearScreen();
 void loggedIn(struct Account* currentAccount, struct Account* lastLoggedInAccount, bool isLoggedIn, struct Account* accounts);
 
 #endif
