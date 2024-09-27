@@ -3,6 +3,7 @@
 - [ x ] Implement passwords
 - [ X ] Add transfers
 - [ X ] Add "card details" to account setup
-- [] cvc to transfer
+- [ X ] cvc to deposit/withdraw and password to transfers
 - [] Add account management
-- [] Hashing passwords
+- [] Cleanup CLI (add clears)
+- [] Hashing passwords (OPTIONAL)

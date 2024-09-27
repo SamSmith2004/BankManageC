@@ -61,6 +61,23 @@ void transfer() {
         printf("Insufficient balance\n");
         return;
     }
+    if (amount < 0) {
+        printf("Invalid amount\n");
+        return;
+    }
+
+    char password[20];
+    printf("Enter your password to confirm: ");
+
+    if (fgets(password, sizeof(password), stdin) == NULL) {
+        printf("Input error\n");
+        return;
+    }
+    password[strcspn(password, "\n")] = 0;
+    if (strcmp(password, account.password) == 1) {
+        printf("Incorrect password\n");
+        return;
+    }
 
     printf("Are you sure you want to transfer %.2f to %s? (y/n)\n", amount / 100.0, choice);
     char confirm[3];
@@ -188,6 +205,20 @@ void deposit() {
         return;
     }
 
+    short cvv;
+    printf("Enter your CVV: ");
+    if (scanf("%hd", &cvv) != 1) {
+        printf("Input error [C1]\n");
+        while (getchar() != '\n');  // Clear input buffer
+        return;
+    }
+    while (getchar() != '\n'); // Clear input buffer after scanf
+
+    if (cvv != account.card.cvv) {
+        printf("Invalid CVV\n");
+        return;
+    }
+
     printf("You are depositing %.2f Confirm? (y/n)\n", depositAmount / 100.0);
 
     if (fgets(confirm, sizeof(confirm), stdin) == NULL) {
@@ -211,7 +242,6 @@ void deposit() {
 
 void withdraw() {
     long long int withdrawAmount;
-    char confirm[10];
     printf("How much to Withdraw (in cents)\n");
 
     if (scanf("%lld", &withdrawAmount) != 1) {
@@ -231,9 +261,24 @@ void withdraw() {
         return;
     }
 
+    short cvv;
+    printf("Enter your CVV: ");
+    if (scanf("%hd", &cvv) != 1) {
+        printf("Input error [C1]\n");
+        while (getchar() != '\n');  // Clear input buffer
+        return;
+    }
+    while (getchar() != '\n'); // Clear input buffer after scanf
+
+    if (cvv != account.card.cvv) {
+        printf("Invalid CVV\n");
+        return;
+    }
+
+    char confirm[10];
     printf("You are withdrawing %.2f Confirm? (y/n)\n", withdrawAmount / 100.0);
     if (fgets(confirm, sizeof(confirm), stdin) == NULL) {
-        printf("Input error\n");
+        printf("Input error [C2]\n");
         return;
     }
     confirm[strcspn(confirm, "\n")] = 0;  // Remove newline
