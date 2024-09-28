@@ -1,5 +1,5 @@
 ##### Bank Manager in C
-This is bank manager program written in C.
+This is Mock bank manager program I wrote in C, to help learn it.
 It is a console application.
 It is a simple program that can be used to manage bank accounts.
 It can be used to create , view accounts and transfer money between accounts.
