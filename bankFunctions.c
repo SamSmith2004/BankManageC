@@ -4,6 +4,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <openssl/evp.h>
+#include <openssl/rand.h>
+
+#define ITERATIONS 10000
+
+void hash_password(const char* password, const unsigned char* salt, unsigned char* hash) {
+    PKCS5_PBKDF2_HMAC(password, strlen(password), salt, SALT_LENGTH, ITERATIONS,
+                      EVP_sha256(), HASH_LENGTH, hash);
+}
 
 struct Account accounts[100];
 struct Account currentAccount;
@@ -70,11 +79,18 @@ struct Account makeAccount(char accountName[20], char password[20]) {
 
     current.id = accountCount;
     strncpy(current.name, accountName, sizeof(current.name) - 1);
-    // Copy at most sizeof(current.name) - 1 characters
-    strncpy(current.password, password, sizeof(current.password) - 1);
     // Ideally hash the password before storing it
     current.name[sizeof(current.name) - 1] = '\0';  // Ensure null-termination
-    current.password[sizeof(current.password) - 1] = '\0';
+
+    unsigned char salt[SALT_LENGTH];
+    unsigned char hash[HASH_LENGTH];
+    RAND_bytes(salt, SALT_LENGTH);
+    hash_password(password, salt, hash);
+
+    // Store the salt and hash
+    memcpy(current.salt, salt, SALT_LENGTH);
+    memcpy(current.password_hash, hash, HASH_LENGTH);
+
     current.balance = 0;
 
     accounts[accountCount] = current;
@@ -264,7 +280,9 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                     }
                 }
 
-                if (strcmp(currentAccount.password, password) == 0) {
+                unsigned char hash[HASH_LENGTH];
+                hash_password(password, lastLoggedInAccount->salt, hash);
+                if (memcmp(hash, lastLoggedInAccount->password_hash, HASH_LENGTH) == 0) {
                     clearScreen();
                     printf("Logged in successfully\n");
                     currentAccount = *lastLoggedInAccount;
@@ -286,17 +304,10 @@ _Bool checkLogin(struct Account* lastLoggedInAccount) {
                         return 0;
                     }
 
-                    if (strlen(password) == 19) {
-                        char c = getchar();
-                        if (c != ' ' && c != '\n' && c != EOF) {
-                            clearScreen();
-                            printf("Password too long\n");
-                            while (getchar() != '\n' && getchar() != EOF);
-                            return 0;
-                        }
-                    }
+                    unsigned char hash[HASH_LENGTH];
+                    hash_password(password, accounts[i].salt, hash);
 
-                    if (strcmp(accounts[i].password, password) == 0) {
+                    if (memcmp(hash, accounts[i].password_hash, HASH_LENGTH) == 0) {
                         clearScreen();
                         printf("Logged in successfully\n");
                         currentAccount = accounts[i];

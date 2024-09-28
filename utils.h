@@ -2,6 +2,8 @@
 #define UTILS_H
 
 #include <stdbool.h>
+#define SALT_LENGTH 16
+#define HASH_LENGTH 32
 
 struct Card {
     long long int cardNumber;
@@ -12,7 +14,8 @@ struct Card {
 struct Account{
     int id;
     char name[20];
-    char password[20];
+    unsigned char salt[SALT_LENGTH];
+    unsigned char password_hash[HASH_LENGTH];
     long long int balance;
     struct Card card;
 };

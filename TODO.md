@@ -6,4 +6,6 @@
 - [ X ] cvv to deposit/withdraw and password to transfers
 - [ X ] Add account management
 - [ X ] Cleanup CLI (add clears)
-- [] Hashing passwords (OPTIONAL)
+- [ X ] Hashing passwords (OPTIONAL)
+
+ - Optimise

@@ -79,7 +79,10 @@ void transfer() {
         return;
     }
     password[strcspn(password, "\n")] = 0;
-    if (strcmp(password, account.password) != 0) {
+
+    unsigned char hash[HASH_LENGTH];
+    hash_password(password, account.salt, hash);
+    if (memcmp(hash, account.password_hash, HASH_LENGTH) != 0) {
         clearScreen();
         printf("Incorrect password\n");
         return;
@@ -187,7 +190,10 @@ void deleteAccount() {
         return;
     }
     password[strcspn(password, "\n")] = 0;
-    if (strcmp(password, account.password) != 0) {
+
+    unsigned char hash[HASH_LENGTH];
+    hash_password(password, account.salt, hash);
+    if (memcmp(hash, account.password_hash, HASH_LENGTH) != 0) {
         clearScreen();
         printf("Incorrect password\n");
         return;
@@ -356,7 +362,10 @@ void withdraw() {
         return;
     }
     password[strcspn(password, "\n")] = 0;
-    if (strcmp(password, account.password) != 0) {
+
+    unsigned char hash[HASH_LENGTH];
+    hash_password(password, account.salt, hash);
+    if (memcmp(hash, account.password_hash, HASH_LENGTH) != 0) {
         clearScreen();
         printf("Incorrect password\n");
         return;
